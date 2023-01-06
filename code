@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+typedef struct ArrStack
+{
+    int top;
+    unsigned capacity;
+    char *str;
+}Stack;
+
+Stack *s;
+char item;
+
+Stack *CreateStack()
+{
+    s=malloc(sizeof(Stack));
+    printf("\nEnter the capacity of stack you want to made: ");
+    scanf("%d",&s->capacity);
+    s->top=-1;
+    s->str=malloc(sizeof(char)*s->capacity);
+    return(s);
+}
+
+int IsEmpty()
+{
+    if(s->top==-1)
+        return(1);
+    else
+        return(0);
+}
+
+int IsFull()
+{
+    if(s->top==s->capacity-1)
+        return(1);
+    else
+        return(0);
+}
+
+int precedance(char item)
+{
+    switch (item)
+    {
+        case '+':
+        case '-':
+            return(1);
+        case '*':
+        case '/':
+            return(2);
+        case '^':
+            return(3);
+    }
+    return(-1); 
+}
+
+void push(char item)
+{
+    if(!IsFull())
+    {
+        s->top++;
+        s->str[s->top]=item;
+    }
+    else
+    {
+        printf("\nStack is overflowed");
+    }
+}
+
+char pop()
+{
+    if(!IsEmpty())
+    {
+        item=s->str[s->top];
+        s->top--;
+        return(item);
+    }
+    else
+    {
+        printf("\nStack is empty");
+    }
+}
+
+int main()
+{
+    int i,key=-1;
+    char Q[30],P[30];
+    printf("\nEnter the infix expression you want to convert into postfix: ");
+    scanf("%s",Q);
+    CreateStack();
+    push('(');
+    Q[strlen(Q)]=')';
+    for(i=0;i<strlen(Q);i++)
+    {
+        if((Q[i]>=65&&Q[i]<=90)||(Q[i]>=97&&Q[i]<=122))
+        {
+            key++;
+            P[key]=Q[i];
+        }
+        else if(Q[i]=='(')
+        {
+            push(Q[i]);
+        }
+        else if(Q[i]==')')
+        {
+            while(s->str[s->top]!='(')
+            {
+                key++;
+                P[key]=pop();
+            }
+            pop();
+        }
+        else
+        {
+            if(precedance(Q[i])>=precedance(s->str[s->top]))
+            {
+                push(Q[i]);
+            }
+            else
+            {
+                while(precedance(Q[i])>=precedance(s->str[s->top]))
+                {
+                    key++;
+                    P[key]=pop();
+                }
+            }
+        }
+    }
+    printf("\n%s",P);
+    return 0;
+}
